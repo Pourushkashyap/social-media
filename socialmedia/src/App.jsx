@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import Profile from './Pages/Profile'
 
 import './App.css'
 
@@ -8,7 +7,7 @@ function App() {
 
   return (
     <>
-     <Profile/>
+     <h1 className='bg-red-500'>my name is pourush</h1>
        
     </>
   )
