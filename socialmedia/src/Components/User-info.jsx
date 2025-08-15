@@ -4,8 +4,11 @@ import { FaCog } from 'react-icons/fa';
 import { Plus } from 'lucide-react'// ensure path and export are correct
 import { CiCamera } from "react-icons/ci";
 import { FaTh, FaBookmark, FaUserAlt } from 'react-icons/fa'
-
+import { useSelector } from 'react-redux';
 function Userinfo() {
+   
+  const user = useSelector((state) => state.user.user)
+  console.log("useselector ke andar ka data",user)
    const [activeTab, setActiveTab] = useState("home")
   return (
     
@@ -22,7 +25,7 @@ function Userinfo() {
         {/* useinfo  */}
         <div className=' pt-4'>
            <div className='flex justify-center'>
-            <div className='font-bold text-2xl'>pourush_7932</div>
+            <div className='font-bold text-2xl'>{user.username}</div>
            <div className='bg-gray-900 px-4  flex items-center justify-center text-white text-sm rounded-xl ml-4 mr-2'>
            Edit Profile
           </div>

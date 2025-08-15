@@ -1,13 +1,12 @@
+import { Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import Login from './Pages/Login';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { storedetail } from './feature/userslice';
-function App() {
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const dispatch = useDispatch()
+import { storedetail } from '../feature/userslice';
 
+export default function ProtectedRoute({ children }) {
+  const [loading, setLoading] = useState(true);
+  const [allowed, setAllowed] = useState(false);
+  const dispatch = useDispatch()
   // useEffect(() => {
   //   const checkAuth = async () => {
   //     try {
@@ -15,27 +14,23 @@ function App() {
   //         method: 'GET',
   //         credentials: 'include', // send cookies
   //       });
-        
-  //     const data = await res.json();
-  //     console.log('Response from /me:', data);
 
   //       if (!res.ok) {
-  //         throw new Error('Unauthorized');
+  //         setAllowed(false);
+  //         return;
   //       }
 
-  //        data = await res.json();
-  //       if (data.loggedIn) {
-  //         navigate('/front'); // already logged in → go to dashboard
-  //       }
+  //       const data = await res.json();
+  //       setAllowed(data.loggedIn === true);
   //     } catch (err) {
-  //       // Not logged in → stay on login page
+  //       setAllowed(false);
   //     } finally {
   //       setLoading(false);
   //     }
   //   };
 
   //   checkAuth();
-  // }, [navigate]);
+  // }, []);
 
   useEffect(() => {
   const checkAuth = async () => {
@@ -45,27 +40,33 @@ function App() {
         credentials: 'include',
       });
       const data = await res.json();
-      console.log('Response from /me:', data);
+      console.log('ProtectedRoute /me response:', data);
 
       if (!res.ok) {
-        throw new Error('Unauthorized');
+        console.error('Response not OK:', res.status);
+        setAllowed(false);
+        return;
       }
-      if (data.loggedIn) {
+    
+      if(data.loggedIn){
+        setAllowed(true)
         dispatch(storedetail(data.user))
-        navigate('/front');
       }
+
+      // setAllowed(data.loggedIn === true);
     } catch (err) {
-      console.error('Auth check error:', err);
+      console.error('ProtectedRoute error:', err);
+      setAllowed(false);
     } finally {
       setLoading(false);
     }
   };
 
   checkAuth();
-}, [navigate,dispatch]);
+}, [dispatch]);
+
   if (loading) return <p>Loading...</p>;
+  if (!allowed) return <Navigate to="/" replace />;
 
-  return <Login />;
+  return children;
 }
-
-export default App;

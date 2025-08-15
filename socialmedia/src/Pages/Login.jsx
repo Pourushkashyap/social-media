@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { useSelector,useDispatch } from 'react-redux';
+import { storedetail } from '../feature/userslice.jsx';
 function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const Navigate = useNavigate()
+  const dispatch = useDispatch()
+
+
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -28,6 +32,7 @@ function Login() {
 
       const res = await fetch('/api/v1/users/register', {
         method: 'POST',
+       
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name,
@@ -40,13 +45,15 @@ function Login() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Registration failed');
-      if(res.ok){
-         Navigate('/front', { replace: true });
-      }
+       dispatch(storedetail(data.data.user))
       alert(data.message);
+         Navigate('/front', { replace: true });
+      
+      
     } else {
       const res = await fetch('/api/v1/users/login', {
         method: 'POST',
+       
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: formData.username, // assuming you login with email
@@ -57,8 +64,10 @@ function Login() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Login failed');
-      if(res.ok) Navigate('/front', { replace: true });
+       dispatch(storedetail(data.data.user))
       alert(data.message);
+      Navigate('/front', { replace: true });
+    
     }
 
     setFormData({ name: '', username: '', email: '', password: '', confirmPassword: '' });
