@@ -1,4 +1,5 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 // FontAwesome icons for Instagram-like icons
@@ -6,12 +7,17 @@ import { FaInstagram, FaHome, FaSearch, FaCompass, FaVideo, FaEnvelope, FaBell, 
 import { SiThreads } from 'react-icons/si'; // Threads icon
 import profile from "../asset/profile.jpg"
 =======
+=======
+>>>>>>> Stashed changes
 // LeftNavbar.jsx
 import React from 'react';
 
 // FontAwesome icons for Instagram-like icons
 import { FaInstagram, FaHome, FaSearch, FaCompass, FaVideo, FaEnvelope, FaBell, FaPlusSquare, FaUser, FaRobot, FaPaintBrush } from 'react-icons/fa';
 import { SiThreads } from 'react-icons/si'; // Threads icon
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 const LeftNavbar = () => {
@@ -26,15 +32,21 @@ const LeftNavbar = () => {
       {/* Navigation Menu */}
       <ul className="space-y-3">
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <NavLink to="/front" className="flex items-center p-2 hover:bg-gray-800 rounded-lg cursor-pointer">
           <FaHome className="text-2xl mr-4" />
           <span className="text-lg">Home</span>
         </NavLink>
 =======
+=======
+>>>>>>> Stashed changes
         <li className="flex items-center p-2 hover:bg-gray-800 rounded-lg cursor-pointer">
           <FaHome className="text-2xl mr-4" />
           <span className="text-lg">Home</span>
         </li>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         <li className="flex items-center p-2 hover:bg-gray-800 rounded-lg cursor-pointer">
           <FaSearch className="text-2xl mr-4" />
@@ -62,15 +74,21 @@ const LeftNavbar = () => {
           <span className="text-lg">Create</span>
         </li>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <NavLink to="/front/profile" className="flex items-center p-2 hover:bg-gray-800 rounded-lg cursor-pointer">
          <img src={profile} className='w-8 h-8 rounded-full mr-2 border-2 p-[1px] border-white' alt="" />
           <span className="text-lg">Profile</span>
         </NavLink >
 =======
+=======
+>>>>>>> Stashed changes
         <li className="flex items-center p-2 hover:bg-gray-800 rounded-lg cursor-pointer">
           <FaUser className="text-2xl mr-4" />
           <span className="text-lg">Profile</span>
         </li>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         <li className="flex items-center p-2 hover:bg-gray-800 rounded-lg cursor-pointer">
           <FaRobot className="text-2xl mr-4" />
