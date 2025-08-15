@@ -1,13 +1,21 @@
+<<<<<<< Updated upstream
 import { useEffect, useState } from 'react';
 import Login from './Pages/Login';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { storedetail } from './feature/userslice';
+=======
+import { useState } from 'react'
+import Navbar from './Pages/Navbar'
+import './App.css'
+
+>>>>>>> Stashed changes
 function App() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch()
 
+<<<<<<< Updated upstream
   // useEffect(() => {
   //   const checkAuth = async () => {
   //     try {
@@ -66,6 +74,14 @@ function App() {
   if (loading) return <p>Loading...</p>;
 
   return <Login />;
+=======
+  return (
+    <>
+    
+       <Navbar/>
+    </>
+  )
+>>>>>>> Stashed changes
 }
 
 export default App;
