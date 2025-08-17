@@ -1,12 +1,17 @@
 import React,{useState} from 'react';
-import profile from '../asset/profile.jpg';
 import { FaCog } from 'react-icons/fa'; 
 import { Plus } from 'lucide-react'// ensure path and export are correct
 import { CiCamera } from "react-icons/ci";
 import { FaTh, FaBookmark, FaUserAlt } from 'react-icons/fa'
 import { useSelector } from 'react-redux';
+import SettingsMenu from './SettingMenu';
+import profile from "../asset/profile.jpg"
+import { useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 function Userinfo() {
-   
+   const navigate = useNavigate()
+
+
   const user = useSelector((state) => state.user.user)
   console.log("useselector ke andar ka data",user)
    const [activeTab, setActiveTab] = useState("home")
@@ -19,31 +24,34 @@ function Userinfo() {
         <div  className='pt-4'>
           <img
            className='w-40 h-40 rounded-full border-4 border-white object-cover' 
-           src={profile} 
+           src={user.avatar || profile} 
            alt="profile img..." />
         </div>
         {/* useinfo  */}
         <div className=' pt-4'>
            <div className='flex justify-center'>
             <div className='font-bold text-2xl'>{user.username}</div>
-           <div className='bg-gray-900 px-4  flex items-center justify-center text-white text-sm rounded-xl ml-4 mr-2'>
+           <NavLink to={"/front/account"} className='bg-gray-900 px-4  flex items-center justify-center text-white text-sm rounded-xl ml-4 mr-2'>
            Edit Profile
-          </div>
+          </NavLink>
 
             <div className='bg-gray-900 px-4 flex items-center text-white justify-center rounded-xl'>View Profile</div>
-           <div className=' flex items-center justify-center  ml-4 p-2 mr-4'> <FaCog className="text-2xl" /></div>
+           <div className=' flex items-center justify-center  ml-4 mr-4'> 
+            {/* <FaCog className="text-2xl" /> */}
+            <SettingsMenu/>
+           </div>
            </div>
            {/* post  */}
            <div className='flex gap-8 mt-6 text-gray-300 '>
              <div> 0 posts</div>
-             <div>262 followers</div>
-             <div>106 following</div>
+             <div>{user.followers.length} followers</div>
+             <div>{user.following.length} following</div>
            </div>
            <div className='mt-7'>
             KASHYAP
            </div>
            <div>
-            LUDHIANA
+            {user.bio}
            </div>
         </div>
 

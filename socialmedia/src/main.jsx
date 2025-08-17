@@ -9,6 +9,8 @@ import Front from './Pages/Front.jsx'
 import ProtectedRoute from './Components/ProtectedRouter.jsx'
 import {store} from "./redux/store.js"
 import {Provider} from 'react-redux'
+import Setting from './Components/Setting.jsx'
+import Profile_section from './Components/Profile_section.jsx'
 
 // const router = createBrowserRouter([
 //   {
@@ -56,7 +58,16 @@ const router = createBrowserRouter([
       {
         path: 'profile', // Matches /front/profile
         element: <Profile />,
+      
       },
+      {
+        path:"account",
+        element:<Setting/>
+      },
+      {
+        path:":username",
+        element:<Profile_section/>
+      }
     ],
   },
 ]);

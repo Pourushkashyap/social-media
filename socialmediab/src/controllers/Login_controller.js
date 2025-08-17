@@ -2,6 +2,7 @@ import {User} from "../model/User.js"
 import { asynchandler } from '../utils/Asynchandler.js';
 import { Apierror } from '../utils/Apierror.js';
 import { Apiresponse } from '../utils/Apiresponse.js';
+import { uploadoncloudinary } from "../utils/cloudinary.js";
 
 const generateaccessandresfreshtoken = async (userid) => {
     try {
@@ -18,10 +19,12 @@ const generateaccessandresfreshtoken = async (userid) => {
     }
 };
 
+
+
 const register = asynchandler(async (req, res) => {
     const { name, username, email, password } = req.body;
 
-    if (!name.trim() || !username || !email || !password) {
+    if (!name || !name.trim() || !username || !email || !password) {
         throw new Apierror(400, "All fields are required");
     }
 
@@ -30,47 +33,63 @@ const register = asynchandler(async (req, res) => {
     });
 
     if (existuser) {
-        throw new Apierror(400, "user with username or email already exist");
+        throw new Apierror(400, "User with username or email already exists");
     }
 
-    const user = await User.create({
-        name,
-        username,
-        email,
-        password
-    });
+    let newUser;
 
-    
+    if (req.file?.path) {
+        const uploadavatar = await uploadoncloudinary(req.file.path);
+        if (!uploadavatar) {
+            throw new Apierror(400, "Avatar upload to Cloudinary failed");
+        }
+        newUser = await User.create({
+            name,
+            username,
+            email,
+            password,
+            avatar: uploadavatar.secure_url
+        });
+    } else {
+        newUser = await User.create({
+            name,
+            username,
+            email,
+            password
+        });
+    }
 
-    const createuser = await User.findById(user.id).select("-password");
+    const createuser = await User.findById(newUser._id).select("-password");
 
     if (!createuser) {
-        throw new Apierror(500, "something went wrong while creating a user");
+        throw new Apierror(500, "Something went wrong while creating the user");
     }
-    const {accesstoken,refreshtoken} =await generateaccessandresfreshtoken(createuser._id);
-    console.log("accesstoken: ", accesstoken)
-    console.log("refreshtoken: ",refreshtoken)
-    
-    const accessoptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production', // only secure in prod
-  sameSite: 'lax',
-  maxAge: 15 * 60 * 1000
-}
 
-const refreshoptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
-  maxAge: 7 * 24 * 60 * 60 * 1000
-}
+    const { accesstoken, refreshtoken } = await generateaccessandresfreshtoken(createuser._id);
+
+    const accessoptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 15 * 60 * 1000
+    };
+
+    const refreshoptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    };
+
     return res.status(201)
-    .cookie("accesstoken",accesstoken,accessoptions)
-    .cookie("refreshtoken",refreshtoken,refreshoptions)
-     .json(
+        .cookie("accesstoken", accesstoken, accessoptions)
+        .cookie("refreshtoken", refreshtoken, refreshoptions)
+        .json(
             new Apiresponse(200, {
-                user: createuser, accesstoken, refreshtoken
-            }, "user register successfully")
+                user: createuser,
+                accesstoken,
+                refreshtoken
+            }, "User registered successfully")
         );
 });
 
@@ -109,7 +128,7 @@ const login = asynchandler(async (req, res) => {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production', // only secure in prod
   sameSite: 'lax',
-  maxAge: 15 * 60 * 1000
+  maxAge: 24 * 60 * 60 * 1000
 }
 
 const refreshoptions = {
@@ -130,7 +149,32 @@ const refreshoptions = {
         );
 });
 
-export { register, login };
+const logout = asynchandler(async(req,res) =>{
+    
+    await User.findByIdAndUpdate(req.user._id,{
+        $set:{
+            refreshtoken:null
+        }
+    })
+   
+    const option = {
+        httpOnly:true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax'
+    }
+
+    console.log("logout ho gya")
+    
+   return res.status(200)
+          .clearCookie("accesstoken",option)
+          .clearCookie("refreshtoken",option)
+          .json(
+           {message:"user logout successfully"}
+          )
+
+})
+
+export { register, login,logout };
 
 
 

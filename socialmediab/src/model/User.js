@@ -3,20 +3,48 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt'
 
 const userSchema = new mongoose.Schema({
+  name:{
+    type:String,
+    required:true,
+    trim:true
+  },
   username: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    unique:true,
   },
   email: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    unique:true,
   },
   password: {
     type: String,
     required: true
   },
+  avatar:{
+    type:String,
+    default:""
+  },
+  bio:{
+    type:String,
+    maxlength:200,
+    default:""
+  },
+  followers:[
+    {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Userr"
+    }
+  ],
+  following:[
+    {
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"User"
+    }
+  ],
   refreshtoken: {
     type: String
   }
