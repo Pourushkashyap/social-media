@@ -6,7 +6,7 @@ function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const Navigate = useNavigate()
   const dispatch = useDispatch()
-
+  const [avatar,setavatar] = useState(null)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -14,6 +14,7 @@ function Login() {
     email: '',
     password: '',
     confirmPassword: '',
+    
   });
 
   const handleInputChange = (e) => {
@@ -30,20 +31,28 @@ function Login() {
         return;
       }
 
+       const formDataToSend = new FormData();
+       formDataToSend.append("name", formData.name);
+       formDataToSend.append("username", formData.username);
+       formDataToSend.append("email", formData.email);
+       formDataToSend.append("password", formData.password);
+       if (avatar) formDataToSend.append("avatar", avatar);
+
       const res = await fetch('/api/v1/users/register', {
         method: 'POST',
        
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name,
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        }),
+        
+        body: formDataToSend,
         credentials: 'include', // important for cookies
       });
 
+      
+
       const data = await res.json();
+      
+       localStorage.setItem("accesstoken",data.data.accesstoken)
+
+     
       if (!res.ok) throw new Error(data.message || 'Registration failed');
        dispatch(storedetail(data.data.user))
       alert(data.message);
@@ -63,6 +72,10 @@ function Login() {
       });
 
       const data = await res.json();
+       
+         localStorage.setItem("accesstoken",data.data.accesstoken)
+         
+ 
       if (!res.ok) throw new Error(data.message || 'Login failed');
        dispatch(storedetail(data.data.user))
       alert(data.message);
@@ -81,13 +94,7 @@ function Login() {
     setFormData({ name: '', username: '', email: '', password: '', confirmPassword: '' });
   };
 
-  // Logout functionality (simulated)
-  const handleLogout = () => {
-    console.log('Logged out');
-    // Add logout logic here (e.g., clear session, redirect)
-    setFormData({ name: '', username: '', email: '', password: '', confirmPassword: '' });
-    setIsSignUp(false); // Reset to sign-in mode
-  };
+ 
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
@@ -136,34 +143,7 @@ function Login() {
           </div>
             </>
           )}
-          {/* {
-            isSignUp && (
-               <div>
-            <label className="block text-sm font-medium">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="mt-1 w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your email"
-              required
-            />
-          </div> 
-            )
-          } */}
-          {/* <div>
-            <label className="block text-sm font-medium">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="mt-1 w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your email"
-              required
-            />
-          </div> */}
+         
           <div>
             <label className="block text-sm font-medium">Password</label>
             <input
@@ -189,7 +169,24 @@ function Login() {
                 required={isSignUp}
               />
             </div>
+             
+
           )}
+          {isSignUp && (
+             <div>
+            <label className="block text-sm font-medium">Profile image</label>
+            <input
+              type="file"
+              name="avatar"
+              onChange={(e) => setavatar(e.target.files[0])}
+              className="mt-1 w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              
+              required
+            />
+          </div>
+          )}
+
+          
           <button
             type="submit"
             className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-md text-white font-semibold transition duration-200"

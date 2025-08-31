@@ -6,7 +6,10 @@ import { upload } from "../middleware/multer_middleware.js";
 import { verifyjwt } from "../middleware/verifyjwt.js"
 import { updateBio } from "../controllers/detail_controller.js";
 import {updateavatar,updateprofile} from "../controllers/detail_controller.js"
-import {searchuser} from "../controllers/user_controller.js"
+import {searchuser,getUserById} from "../controllers/user_controller.js"
+import { togglefollow } from "../controllers/user_controller.js";
+import {getuserconnection} from "../controllers/user_controller.js"
+
 const router = Router();
 
 router.post('/register',upload.single("avatar"),register);
@@ -16,12 +19,18 @@ router.put("/bio",verifyjwt,updateBio)
 router.put("/updateavatar",verifyjwt,updateavatar)
 router.put("/updateprofile",verifyjwt,upload.single("avatar"),updateprofile)
 router.get("/search",verifyjwt,searchuser)
-
-
+router.post("/follow",verifyjwt,togglefollow)
+router.get("/connection",verifyjwt,getuserconnection)
 
 router.get('/me', verifyjwt, async (req, res) => {
   const user = await User.findById(req.user._id).select('-password');
   res.json({ loggedIn: true, user });
 });
+
+
+router.get("/:id",getUserById);
+
+
+
 
 export default router;

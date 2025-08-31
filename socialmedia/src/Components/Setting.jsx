@@ -56,7 +56,7 @@ function Setting() {
 
   return (
     <>
-     <div className='bg-[#181818] ml-64   px-20  w-screen '> 
+     <div className='bg-[#181818] md:ml-64 ml-20   px-20  w-screen '> 
  
       <div>
        <p className='font-bold text-2xl py-8 text-gray-200'>Edit profile</p>
@@ -65,7 +65,9 @@ function Setting() {
         <div className='flex items-center space-x-4'>
           <img
            className='w-16 h-16 rounded-full border-2 border-gray-700 object-cover' 
-           src={user.avatar || profile}
+           src={selectedImage ? URL.createObjectURL(selectedImage)
+            : user.avatar? user.avatar : profile
+           }
            alt="profile"
          />
          <div>

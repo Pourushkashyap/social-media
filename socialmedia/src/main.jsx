@@ -11,6 +11,7 @@ import {store} from "./redux/store.js"
 import {Provider} from 'react-redux'
 import Setting from './Components/Setting.jsx'
 import Profile_section from './Components/Profile_section.jsx'
+import Message from "./Pages/Message.jsx"
 
 // const router = createBrowserRouter([
 //   {
@@ -63,6 +64,14 @@ const router = createBrowserRouter([
       {
         path:"account",
         element:<Setting/>
+      },
+      {
+        path:"message",
+        element:<Message/>
+      },
+      {
+        path:"message/:id",
+        element:<Message/>
       },
       {
         path:":username",

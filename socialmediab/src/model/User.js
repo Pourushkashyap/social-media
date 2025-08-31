@@ -35,19 +35,34 @@ const userSchema = new mongoose.Schema({
   },
   followers:[
     {
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Userr"
-    }
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User', // Fixed typo from "Userr" to "User"
+      validate: {
+        validator: (id) => mongoose.Types.ObjectId.isValid(id),
+        message: 'Invalid ObjectId in followers array',
+      },
+    },
   ],
   following:[
-    {
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"User"
-    }
+   {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      validate: {
+        validator: (id) => mongoose.Types.ObjectId.isValid(id),
+        message: 'Invalid ObjectId in following array',
+      },
+    },
   ],
   refreshtoken: {
     type: String
   }
+},
+{
+  // Ensure followers and following are always arrays
+  default: {
+    followers: [],
+    following: [],
+  },
 });
 
 userSchema.pre("save", async function (next) {
@@ -66,7 +81,8 @@ userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
-      email: this.email
+      email: this.email,
+      username: this.username 
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
