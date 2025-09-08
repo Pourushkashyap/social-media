@@ -9,7 +9,7 @@ function verifyjwt(req, res, next) {
     console.log("bhai token aaya hi nhi")
   return res.status(401).json({ message: 'bhai token nhi aaya' });
   } 
-  console.log(token)
+  console.log(token)   
 
   try {
     req.user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);

@@ -8,6 +8,9 @@ import { useLocation } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import {updatefollowing,storedetail} from "../feature/userslice.jsx"
 import { useDispatch,useSelector } from 'react-redux';
+import PostModal from './PostModel.jsx';
+
+
 
 function Profile_section() {
     const {username} = useParams();
@@ -17,12 +20,15 @@ function Profile_section() {
   const dispatch = useDispatch()
   const currentuser = useSelector((state) => state.user.user);
 
+  const [selectedPost, setSelectedPost] = useState(null);
+
+
 
   const [showlist, setshowlist] = useState(false);
     const [connections, setConnections] = useState({ followers: [], following: [] });
     const [modalType, setModalType] = useState("followers"); 
     const [error, setError] = useState(null);
-    
+    const [post, setpost] = useState([]);
 
     const showConnections = async (type) => {
     try {
@@ -37,6 +43,9 @@ function Profile_section() {
       const data = await res.json();
       setConnections(data.data || { followers: [], following: [] });
       setModalType(type); // "followers" ya "following"
+      
+      
+
       setshowlist(true);
     } catch (err) {
       console.error("Error fetching connections:", err);
@@ -44,25 +53,77 @@ function Profile_section() {
     }
   };
 
-  useEffect(() =>{
-    if(user && currentuser){
-      setisfollowing(user.followers?.includes(currentuser._id))
+  // useEffect(async() =>{
+  //   if(user && currentuser){
+  //     setisfollowing(user.followers?.includes(currentuser._id))
+  //   }
+  //   if(!user){
+  //      await fetch(`/api/v1/users/search?query=${username}`,{
+  //           method:'GET',
+  //           credentials:"include"
+  //       }).then(res =>res.json())
+  //       .then(async data =>{
+  //           if(data.data && data.data.length > 0){
+  //       setUser(data.data[0]); 
+        
+  //       const res2 = await fetch(`/api/v1/posts/user/${user?._id}`, {
+  //       method: "GET",
+  //       credentials: "include",
+  //     });
+
+  //     const data2 = await res2.json();
+
+  //     console.log("Response from posts fetch:", data2); 
+  //     setpost(data2.data || []);
+        
+  //     } else {
+  //       console.log("No user found");
+  //     }
+  //       })
+  //       .catch(err =>console.log(err))
+  //   }
+  // },[username,user])
+
+  useEffect(() => {
+  const fetchUserAndPosts = async () => {
+    if (user && currentuser) {
+      setisfollowing(user.followers?.includes(currentuser._id));
     }
-    if(!user){
-        fetch(`/api/v1/users/search?query=${username}`,{
-            method:'GET',
-            credentials:"include"
-        }).then(res =>res.json())
-        .then(data =>{
-            if(data.data && data.data.length > 0){
-        setUser(data.data[0]);  
-      } else {
-        console.log("No user found");
+    if (!user) {
+      try {
+        const res = await fetch(`/api/v1/users/search?query=${username}`, {
+          method: "GET",
+          credentials: "include",
+        });
+        const data = await res.json();
+
+        if (data.data && data.data.length > 0) {
+          const foundUser = data.data[0];
+          setUser(foundUser);
+
+          // ✅ Use foundUser instead of user?._id
+         
+        } else {
+          console.log("No user found");
+        }
+      } catch (err) {
+        console.error("Error fetching user/posts:", err);
       }
-        })
-        .catch(err =>console.log(err))
     }
-  },[username,user])
+    if(user){
+       const res2 = await fetch(`/api/v1/posts/user/${user._id}`, {
+            method: "GET",
+            credentials: "include",
+          });
+          const data2 = await res2.json();
+          console.log("Response from posts fetch:", data2);
+          setpost(data2.data || []);
+    }
+  };
+
+  fetchUserAndPosts();
+}, [username, currentuser]);
+
 
  const follow = async () => {
   try {
@@ -127,7 +188,7 @@ function Profile_section() {
            </div>
            {/* post  */}
            <div className='flex gap-8 mt-6 text-gray-300 '>
-             <div> 0 posts</div>
+             <div> {post.length} posts</div>
              <div onClick={() => showConnections("followers")} className="cursor-pointer">{user?.followers?.length} followers</div>
              <div onClick={() => showConnections("following")} className="cursor-pointer">{user?.following?.length} following</div>
            </div>
@@ -178,18 +239,26 @@ function Profile_section() {
       <hr  className=' border-gray-700'/>
       
       {activeTab == 'home' && (
-       <div className='mt-10'>
-        <div className='flex justify-center'>
-           <button className='w-16 h-16 bg-black border-2 border-gray-200 rounded-full flex items-center justify-center'>
-            <CiCamera className='text-gray-200 ' size={40}/>
-           </button>
-
-                </div>
-                <div  className='font-bold my-4 text-4xl flex justify-center'>Share Photos</div>
-                <div className='flex justify-center'>When you share photos, they will appear on your profile.</div>
-                <div className='text-blue-500 my-4 flex justify-center hover:text-blue-600'>Share Your first photo</div>
-      </div>
-
+      <div className="grid grid-cols-3 gap-0">
+        {post.map((p) => (
+          <div
+            key={p._id}
+            className="relative group cursor-pointer aspect-square"
+            onClick={() => setSelectedPost(p)}
+          >
+            <img
+              src={p.image}
+              alt="post"
+              className="w-[350px] h-[500px] object-cover"
+            />
+            {/* overlay on hover */}
+            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-bold text-lg transition">
+              ❤️ {p.likes?.length || 0}
+            </div>
+          </div>
+        ))}
+      </div>    
+ 
       )}
 
       
@@ -265,6 +334,14 @@ function Profile_section() {
                 </button>
               </div>
             </div>
+          )}
+
+          {selectedPost && (
+         <PostModal
+  post={{ ...selectedPost, currentUserId: currentuser._id }}
+  onClose={() => setSelectedPost(null)}
+/>
+
           )}
     </>
 

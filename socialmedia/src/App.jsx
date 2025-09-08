@@ -1,11 +1,9 @@
-
-
 import { useEffect, useState } from 'react';
 import Login from './Pages/Login';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { storedetail } from './feature/userslice';
-
+import { setPosts } from './feature/postslice';
 
 
 
@@ -15,34 +13,7 @@ function App() {
   const dispatch = useDispatch()
 
 
-  // useEffect(() => {
-  //   const checkAuth = async () => {
-  //     try {
-  //       const res = await fetch('/api/v1/users/me', {
-  //         method: 'GET',
-  //         credentials: 'include', // send cookies
-  //       });
-        
-  //     const data = await res.json();
-  //     console.log('Response from /me:', data);
 
-  //       if (!res.ok) {
-  //         throw new Error('Unauthorized');
-  //       }
-
-  //        data = await res.json();
-  //       if (data.loggedIn) {
-  //         navigate('/front'); // already logged in → go to dashboard
-  //       }
-  //     } catch (err) {
-  //       // Not logged in → stay on login page
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   checkAuth();
-  // }, [navigate]);
 
   useEffect(() => {
   const checkAuth = async () => {
@@ -59,6 +30,21 @@ function App() {
       }
       if (data.loggedIn) {
         dispatch(storedetail(data.user))
+         console.log('User details stored in Redux:', data.user._id);
+       const postRes = await fetch(`/api/v1/posts/user/${data.user._id}`, {
+       method: "GET",
+      credentials: "include",
+});
+
+const postData = await postRes.json();
+console.log('Response from posts fetch:', postData); // 👈 Yaha print karega
+
+if (postRes.ok) {
+  dispatch(setPosts(postData.data));
+}
+
+
+
         navigate('/front');
       }
     } catch (err) {

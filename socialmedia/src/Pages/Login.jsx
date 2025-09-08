@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector,useDispatch } from 'react-redux';
 import { storedetail } from '../feature/userslice.jsx';
+import { setPosts } from '../feature/postslice.js';
 function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const Navigate = useNavigate()
@@ -55,6 +56,18 @@ function Login() {
      
       if (!res.ok) throw new Error(data.message || 'Registration failed');
        dispatch(storedetail(data.data.user))
+       
+       const postRes = await fetch(`/api/v1/posts/user/${data.data.user._id}`, {
+            method: "GET",
+            credentials: "include",
+       });
+       const postData = await postRes.json();
+      if (postRes.ok) {
+      dispatch(setPosts(postData.data));
+     }
+
+
+
       alert(data.message);
          Navigate('/front', { replace: true });
       
@@ -78,6 +91,15 @@ function Login() {
  
       if (!res.ok) throw new Error(data.message || 'Login failed');
        dispatch(storedetail(data.data.user))
+       const postRes = await fetch(`/api/v1/posts/user/${data.data.user._id}`, {
+         method: "GET",
+         credentials: "include",
+       });
+       const postData = await postRes.json();
+       if (postRes.ok) {
+         dispatch(setPosts(postData.data));
+       }
+
       alert(data.message);
       Navigate('/front', { replace: true });
     

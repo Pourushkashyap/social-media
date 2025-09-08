@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import SettingsMenu from "./SettingMenu";
 import profile from "../asset/profile.jpg";
 import { NavLink, useNavigate } from "react-router-dom";
+import UserPost from "./User-post";
 
 function Userinfo() {
   const navigate = useNavigate();
@@ -14,6 +15,12 @@ function Userinfo() {
   const [modalType, setModalType] = useState("followers"); 
   const [error, setError] = useState(null);
   const user = useSelector((state) => state.user.user);
+
+  const post = useSelector((state) => state.post.posts);
+
+  console.log("post dekh kitni hai apne pass: ",post)
+
+  const [showCreatePost, setShowCreatePost] = useState(false);
 
   const [activeTab, setActiveTab] = useState("home");
 
@@ -72,7 +79,7 @@ function Userinfo() {
 
             {/* posts / followers / following */}
             <div className="flex gap-8 mt-6 text-gray-300">
-              <div>0 posts</div>
+              <div>{post.length} posts</div>
               <div onClick={() => showConnections("followers")} className="cursor-pointer">
                 {user.followers.length} followers
               </div>
@@ -86,7 +93,7 @@ function Userinfo() {
           </div>
         </div>
 
-        {/* new post button */}
+        {/* new highlight button */}
         <div>
           <div className="space-y-1 mt-5">
             <button className="w-24 h-24 bg-[#1a1a1a] border-4 border-gray-600 rounded-full flex items-center justify-center">
@@ -124,24 +131,67 @@ function Userinfo() {
 
         <hr className="border-gray-700" />
 
-        {activeTab === "home" && (
-          <div className="mt-10">
-            <div className="flex justify-center">
-              <button className="w-16 h-16 bg-black border-2 border-gray-200 rounded-full flex items-center justify-center">
-                <CiCamera className="text-gray-200" size={40} />
-              </button>
-            </div>
-            <div className="font-bold my-4 text-4xl flex justify-center">
-              Share Photos
-            </div>
-            <div className="flex justify-center">
-              When you share photos, they will appear on your profile.
-            </div>
-            <div className="text-blue-500 my-4 flex justify-center hover:text-blue-600">
-              Share Your first photo
+{activeTab === "home" && (
+  <div className="mt-6">
+    {/* Always show Add Post button */}
+    <div className="flex justify-end mb-4 pr-4">
+      {post && post.length > 0 && (
+        <button
+          onClick={() => setShowCreatePost(true)}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+        >
+          <Plus size={18} /> Add Post
+        </button>
+      )}
+    </div>
+
+    {post && post.length > 0 ? (
+      // ✅ Posts grid
+      <div className="grid grid-cols-3 gap-0">
+        {post.map((p) => (
+          <div
+            key={p._id}
+            className="relative group cursor-pointer aspect-square"
+          >
+            <img
+              src={p.image}
+              alt="post"
+              className="w-[350px] h-[500px] object-cover"
+            />
+            {/* overlay on hover */}
+            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-bold text-lg transition">
+              ❤️ {p.likes?.length || 0}
             </div>
           </div>
-        )}
+        ))}
+      </div>
+    ) : (
+      // ❌ No posts fallback
+      <>
+        <div className="flex justify-center">
+          <button className="w-16 h-16 bg-black border-2 border-gray-200 rounded-full flex items-center justify-center">
+            <CiCamera className="text-gray-200" size={40} />
+          </button>
+        </div>
+        <div className="font-bold my-4 text-4xl flex justify-center">
+          Share Photos
+        </div>
+        <div className="flex justify-center">
+          When you share photos, they will appear on your profile.
+        </div>
+        <div
+          onClick={() => setShowCreatePost(true)}
+          className="text-blue-500 my-4 flex justify-center cursor-pointer hover:text-blue-600"
+        >
+          Share Your first photo
+        </div>
+      </>
+    )}
+  </div>
+)}
+
+
+
       </div>
 
       {/* connections modal */}
@@ -212,6 +262,11 @@ function Userinfo() {
             </button>
           </div>
         </div>
+      )}
+
+       {/* create post modal */}
+      {showCreatePost && (
+        <UserPost onClose={() => setShowCreatePost(false)} />
       )}
     </>
   );
